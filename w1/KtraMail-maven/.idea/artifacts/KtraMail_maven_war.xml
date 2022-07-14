@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="KtraMail-maven:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>KtraMail-maven</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="KtraMail-maven-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="KtraMail-maven:war exploded" />
+    </root>
+  </artifact>
+</component>
