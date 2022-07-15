@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Title</title>
+    <style>
+        tr,th,td,table{
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        table{
+            width: 1000px;
+            margin: auto;
+        }
+        img{
+            height: 160px;
+            width: 160px;
+        }
+    </style>
+</head>
+<body>
+<a href="/home"><h1 >Home</h1></a>
+<table>
+    <tr>
+    <tr><th colspan="8">List Product</th></tr>
+    <tr>
+        <td colspan="2" style="text-align: left">
+            <a href="/create">
+                <button type="button" class="btn btn-primary">Create</button>
+            </a>
+        </td>
+        <td colspan="6" style="text-align: right">
+            <form action="/search" method="get">
+                <input type="text" placeholder="enter product name" name="key" required>
+                <button type="submit" class="btn btn-info">Search</button>
+            </form>
+        </td>
+
+    </tr>
+    <tr>
+        <th >id</th>
+        <th>name</th>
+        <th>price</th>
+        <th>img</th>
+        <th>category</th>
+        <th>status</th>
+        <th colspan="2">Action</th>
+    </tr>
+    <tr th:each="p:${products}" >
+        <td th:text="${p.getIdP()}">id</td>
+        <td th:text="${p.getpName()}">name</td>
+        <td th:text="${p.getPrice()}">price</td>
+        <td ><img th:src="${p.getImgURL()}" alt=""></td>
+        <td th:text="${p.getCategory().getName()}">category</td>
+        <td style="color: green" th:if="${p.isStatus()}==true">Stoking</td>
+        <td style="color: red" th:unless="${p.isStatus()}==true">Out of Stock</td>
+        <td><a th:href="@{/edit/{id}(id=${p.getIdP()})}"><button type="button" class="btn btn-warning">Edit</button>
+        </a></td>
+        <td><a  th:href="@{/delete/{id}(id=${p.getIdP()})}"  class="delete"  ><button type="button" class="btn btn-danger" >Delete</button>
+        </a></td>
+    </tr>
+</table>
+</body>
+<script>
+    let deleteLinks = document.querySelectorAll('.delete');
+    for (let i = 0; i < deleteLinks.length; i++) {
+        deleteLinks[i].addEventListener('click', function(event) {
+            event.preventDefault();
+            let choice = confirm("Bạn chắc chắn xóa?");
+            if (choice) {
+                window.location.href = this.getAttribute('href');
+            }
+        });
+    }
+</script>
+</html>
