@@ -1,0 +1,18 @@
+com/codegym/model/Product.java
+ com.codegym.model.Product
+com/codegym/model/Category.java
+ com.codegym.model.Category
+com/codegym/service/CRUD.java
+ com.codegym.service.CRUD
+com/codegym/filter/RequestFilter.java
+ com.codegym.filter.RequestFilter
+com/codegym/service/CategoryService.java
+ com.codegym.service.CategoryService
+com/codegym/config/ApplicationInitializer.java
+ com.codegym.config.ApplicationInitializer
+com/codegym/service/ProductService.java
+ com.codegym.service.ProductService
+com/codegym/controller/ProductController.java
+ com.codegym.controller.ProductController
+com/codegym/config/WebConfig.java
+ com.codegym.config.WebConfig
