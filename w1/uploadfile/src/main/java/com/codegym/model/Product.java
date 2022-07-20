@@ -1,14 +1,37 @@
 package com.codegym.model;
 
+import com.sun.istack.NotNull;
+import net.bytebuddy.implementation.bind.annotation.Default;
+import org.springframework.lang.NonNull;
+
+import javax.persistence.*;
+
+@Entity
 public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private int price;
+
+    @NotNull
     private String name;
     private String img;
+    @Column(columnDefinition = "boolean default true")
     private boolean status;
+
+    @ManyToOne
+    @NotNull
     private Category category;
 
     public Product() {
+    }
+
+    public Product(int price, String name, String img, Category category) {
+        this.price = price;
+        this.name = name;
+        this.img = img;
+        this.status = status;
+        this.category = category;
     }
 
     public Product(int id, int price, String name, String img, boolean status, Category category) {

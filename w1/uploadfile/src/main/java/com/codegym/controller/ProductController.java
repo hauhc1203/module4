@@ -1,6 +1,7 @@
 package com.codegym.controller;
 
 import com.codegym.model.Product;
+import com.codegym.repository.ProductRepo;
 import com.codegym.service.CategoryService;
 import com.codegym.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,8 @@ import java.io.IOException;
 public class ProductController {
     @Autowired
     ProductService productService;
-
+    @Autowired
+    ProductRepo productRepo;
     @Autowired
     CategoryService categoryService;
 
@@ -28,38 +30,40 @@ public class ProductController {
         return modelAndView;
     }
 
-    @GetMapping("/edit/{index}")
-    public ModelAndView showEdit(@PathVariable int index){
+    @GetMapping("/edit/{id}")
+    public ModelAndView showEdit(@PathVariable int id){
         ModelAndView modelAndView = new ModelAndView("edit");
-        modelAndView.addObject("product", productService.getAll().get(index));
+        modelAndView.addObject("product", productRepo.findById(id));
         modelAndView.addObject("categories", categoryService.getAll());
         return modelAndView;
     }
 
-    @PostMapping("/edit/{index}")
-    public ModelAndView edit(@ModelAttribute Product product, @PathVariable int index,
+    @PostMapping("/edit/{id}")
+    public ModelAndView edit(@ModelAttribute Product product, @PathVariable int id,
                              @RequestParam int categoryIndex,@RequestParam MultipartFile file){
-        String nameImg = file.getOriginalFilename();
-        if (nameImg.equals("")){
-            product.setImg(productService.findByindex(index).getImg());
-        }else {
-            product.setImg("/img/" + nameImg);
+
+        String link=productRepo.findById(id).getImg();
+        String oldName=productService.nameFile2(link);
+
+        product.setImg(link);
+        if (!file.getOriginalFilename().equals("")){
+            try {
+                FileCopyUtils.copy(file.getBytes(), new File("/home/hauhc1203/Desktop/module4/w1/uploadfile/src/main/webapp/WEB-INF/img/" + oldName));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        try {
-            FileCopyUtils.copy(file.getBytes(), new File("/home/hauhc1203/Desktop/module4/w1/uploadfile/src/main/webapp/WEB-INF/img/" + nameImg));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         ModelAndView modelAndView = new ModelAndView("redirect:/products");
         product.setCategory(categoryService.getAll().get(categoryIndex));
-        productService.edit(product,index);
+        productRepo.edit(product);
         return modelAndView;
     }
 
 
-    @GetMapping("/del/{index}")
-    public ModelAndView del(@PathVariable("index") int index){
-        productService.delete(index);
+    @GetMapping("/del/{id}")
+    public ModelAndView del(@PathVariable("id") int id){
+        productService.delete(id);
         ModelAndView modelAndView = new ModelAndView("redirect:/products");
 
         return modelAndView;
@@ -73,21 +77,30 @@ public class ProductController {
 
         return modelAndView;
     }
+
     @PostMapping("/create")
     public ModelAndView create(@ModelAttribute Product product, @RequestParam int categoryIndex,@RequestParam MultipartFile file){
-        String nameImg = file.getOriginalFilename();
-
-            product.setImg("/img/" + nameImg);
+            String newName= productService.newName(file);
+            product.setImg("/img/" +newName );
 
         try {
-            FileCopyUtils.copy(file.getBytes(), new File("/home/hauhc1203/Desktop/module4/w1/uploadfile/src/main/webapp/WEB-INF/img/" + nameImg));
+            FileCopyUtils.copy(file.getBytes(), new File("/home/hauhc1203/Desktop/module4/w1/uploadfile/src/main/webapp/WEB-INF/img/" + newName));
         } catch (IOException e) {
             e.printStackTrace();
         }
         ModelAndView modelAndView = new ModelAndView("redirect:/products");
         product.setCategory(categoryService.getAll().get(categoryIndex));
-        productService.getAll().add(product);
+       productService.create(product);
         return modelAndView;
+    }
+
+    @PostMapping("/search")
+    public ModelAndView search(@RequestParam String key){
+        ModelAndView modelAndView=new ModelAndView("home");
+
+        modelAndView.addObject("products",  productService.search(key));
+        return modelAndView;
+
     }
 
 

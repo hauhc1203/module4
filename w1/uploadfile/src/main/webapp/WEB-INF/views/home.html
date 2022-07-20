@@ -12,8 +12,14 @@
 <body>
 
 <div class="container">
-  <h2>Striped Rows</h2>
-  <a type="button" th:href="@{/create}" class="btn btn-primary">Create</a>
+  <h2><a href="/products">Home</a></h2>
+  <div style="display: flex;justify-content: space-between;width: 1100px;height: auto">
+    <a type="button" th:href="@{/create}" class="btn btn-primary">Create</a>
+    <form action="/search" method="post">
+      <input type="text" placeholder="nhập vào tên" name="key" required>
+      <button type="submit" class="btn btn-info">Search</button>
+    </form>
+  </div>
   <table class="table table-striped">
     <thead>
     <tr>
@@ -38,8 +44,8 @@
       <td th:if="${!p.status}" style="color: red">Hết hàng</td>
 
       <td th:text="${p.category.name}"></td>
-      <td><a type="button" th:href="@{/edit/{index}(index=${obj.index})}" class="btn btn-warning">Edit</a></td>
-      <td><a type="button" th:href="@{/del/{index}(index=${obj.index})}" class="btn btn-danger">Delete</a></td>
+      <td><a type="button" th:href="@{/edit/{id}(id=${p.id})}" class="btn btn-warning">Edit</a></td>
+      <td><a type="button" th:href="@{/del/{id}(id=${p.id})}" class="btn btn-danger">Delete</a></td>
 
     </tr>
     </tbody>

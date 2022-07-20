@@ -1,32 +1,34 @@
 package com.codegym.service;
 
 import com.codegym.model.Product;
+import com.codegym.repository.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ProductService implements CRUD<Product> {
-    private List<Product> products;
 
+    @Autowired
+    ProductRepo productRepo;
 
-    CategoryService categoryService =new CategoryService() ;
-
+    private static  final  String GETNAME="(.*?)\\.(.*?)";
+    private static  final  String GETNAME2="/img/(.*?)";
+    private List<Product> products=new ArrayList<>();
 
     public ProductService( ) {
 
-
-        products = new ArrayList<>();
-        products.add(new Product(1, 500, "Hoàng", "/img/2.jpeg", false, categoryService.getAll().get(0)));
-        products.add(new Product(2, 1000, "Thế", "/img/12.jpeg", true, categoryService.getAll().get(1)));
     }
 
 
     @Override
     public void create(Product product) {
-        products.add(product);
+       productRepo.save(product);
     }
 
     @Override
@@ -35,18 +37,46 @@ public class ProductService implements CRUD<Product> {
     }
 
     @Override
-    public void delete(int index) {
-        Product product=  products.get(index);
+    public void delete(int id) {
+        Product product=  productRepo.findById(id);
         File anh=new File("/home/hauhc1203/Desktop/module4/w1/uploadfile/src/main/webapp/WEB-INF" +product.getImg());
         anh.delete();
-        products.remove(index);
+        productRepo.delete(id);
     }
 
-    public Product findByindex(int index){
-        return products.get(index);
-    }
+
     @Override
     public List<Product> getAll() {
+        products=productRepo.getList();
         return products;
     }
+
+    public  String nameFile(String name){
+        Pattern p = Pattern.compile(GETNAME);
+        Matcher m = p.matcher(name);
+        m.matches();
+
+        return m.group(2);
+    }
+
+    public   String nameFile2(String name){
+        Pattern p = Pattern.compile(GETNAME2);
+        Matcher m = p.matcher(name);
+        m.matches();
+
+        return m.group(1);
+    }
+    public  String newName(MultipartFile file){
+        String nameImg = file.getOriginalFilename();
+        String ext=nameFile(nameImg);
+        int stt=productRepo.maxID()+1;
+        String name="product"+stt+"."+ext;
+
+        return name;
+    }
+    public ArrayList<Product> search(String key){
+        key = "%"+key+"%";
+        return productRepo.search(key);
+    }
+
 }

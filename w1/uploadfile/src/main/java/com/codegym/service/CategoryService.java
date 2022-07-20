@@ -1,20 +1,24 @@
 package com.codegym.service;
 
 import com.codegym.model.Category;
+import com.codegym.repository.CategoryRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryService {
+    @Autowired
+    CategoryRepo categoryRepo;
+
     public List<Category> categories = new ArrayList<>();
 
     public CategoryService() {
-        categories = new ArrayList<>();
-        categories.add(new Category(1, "C0322g1"));
-        categories.add(new Category(2, "C0422g1"));
-        categories.add(new Category(3, "C0522g1"));
+
     }
     public List<Category> getAll() {
+        categories=categoryRepo.getList();
+
         return categories;
     }
 }
