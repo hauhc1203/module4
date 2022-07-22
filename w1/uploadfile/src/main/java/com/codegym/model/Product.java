@@ -9,14 +9,14 @@ import javax.persistence.*;
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int price;
 
     @NotNull
     private String name;
     private String img;
-    @Column(columnDefinition = "boolean default true")
+    @Column(columnDefinition = "true")
     private boolean status;
 
     @ManyToOne

@@ -38,10 +38,14 @@
                     <input  id="duphong"  name="file"  hidden type="file">
 
                 </th>
-                <th><input th:field="*{status}"></th>
+                <th><select th:field="*{status}">
+                    <option th:value="true"  th:selected="*{status}" >còn hàng</option>
+                    <option th:value="false" th:selected="*{status}">hết hàng</option>
+
+                </select></th>
                 <th>
-                    <select name="categoryIndex">
-                        <option th:each="c,obj: ${categories}" th:text="${c.name}" th:value="${obj.index}" th:selected="${c.id==product.category.id}"></option>
+                    <select name="categoryId">
+                        <option th:each="c,obj: ${categories}" th:text="${c.name}" th:value="${c.getId()}" th:selected="${c.id==product.category.id}"></option>
                     </select>
                 </th>
             </tr>

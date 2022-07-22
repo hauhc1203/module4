@@ -1,61 +1,55 @@
 package com.codegym.service;
 
 import com.codegym.model.Product;
-import com.codegym.repository.ProductRepo;
+import com.codegym.repository.IProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ProductService implements CRUD<Product> {
+@Repository
+public class ProductService  {
 
     @Autowired
-    ProductRepo productRepo;
+    IProductRepo iProductRepo;
 
     private static  final  String GETNAME="(.*?)\\.(.*?)";
     private static  final  String GETNAME2="/img/(.*?)";
-    private List<Product> products=new ArrayList<>();
+    private List<Product> products;
 
-    public ProductService( ) {
 
+
+    public Page<Product> getAll(Pageable pageable) {
+        return iProductRepo.findAll(pageable);
     }
 
-
-    @Override
-    public void create(Product product) {
-       productRepo.save(product);
+    public void deleteByID(int id){
+        Product product =iProductRepo.findById(id).get();
+        File img=new File("/home/hauhc1203/Desktop/module4/w1/uploadfile/src/main/webapp/WEB-INF" +product.getImg());
+        img.delete();
+        iProductRepo.deleteById(id);
     }
 
-    @Override
-    public void edit(Product product, int index) {
-        products.set(index, product);
+    public Product findByID(int id){
+        return iProductRepo.findById(id).get();
     }
 
-    @Override
-    public void delete(int id) {
-        Product product=  productRepo.findById(id);
-        File anh=new File("/home/hauhc1203/Desktop/module4/w1/uploadfile/src/main/webapp/WEB-INF" +product.getImg());
-        anh.delete();
-        productRepo.delete(id);
-    }
-
-
-    @Override
-    public List<Product> getAll() {
-        products=productRepo.getList();
-        return products;
+    public void save(Product product){
+        iProductRepo.save(product);
     }
 
     public  String nameFile(String name){
         Pattern p = Pattern.compile(GETNAME);
         Matcher m = p.matcher(name);
         m.matches();
-
         return m.group(2);
     }
 
@@ -69,14 +63,14 @@ public class ProductService implements CRUD<Product> {
     public  String newName(MultipartFile file){
         String nameImg = file.getOriginalFilename();
         String ext=nameFile(nameImg);
-        int stt=productRepo.maxID()+1;
+        int stt=iProductRepo.maxID()+1;
         String name="product"+stt+"."+ext;
 
         return name;
     }
-    public ArrayList<Product> search(String key){
-        key = "%"+key+"%";
-        return productRepo.search(key);
+    public Page<Product> search(String key,Pageable pageable){
+
+        return iProductRepo.findAllByNameContaining(key,pageable);
     }
 
 }

@@ -33,8 +33,8 @@
                 <th>
                     <input  name="file" type="file"   ></th>
                 <th>
-                    <select name="categoryIndex">
-                        <option th:each="c,obj: ${categories}" th:text="${c.name}" th:value="${obj.index}" ></option>
+                    <select name="categoryId">
+                        <option th:each="c,obj: ${categories}" th:text="${c.name}" th:value="${c.getId()}" ></option>
                     </select>
                 </th>
             </tr>

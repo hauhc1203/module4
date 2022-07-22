@@ -1,26 +1,29 @@
 package com.codegym.config;
 
-import com.codegym.repository.CategoryRepo;
-import com.codegym.repository.ProductRepo;
-import com.codegym.service.CategoryService;
-import com.codegym.service.ProductService;
+
+
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.ViewResolver;
+
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.spring5.ISpringTemplateEngine;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -35,7 +38,10 @@ import java.util.Properties;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan("com.codegym.controller")
+@ComponentScan("com.codegym")
+@EnableTransactionManagement
+@EnableSpringDataWebSupport
+@EnableJpaRepositories("com.codegym.repository")
 public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 
@@ -68,18 +74,6 @@ public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationCon
         viewResolver.setCharacterEncoding("UTF-8");
         viewResolver.setTemplateEngine((ISpringTemplateEngine) templateEngine());
         return viewResolver;
-    }
-
-    @Bean
-    public CategoryService categoryService() {
-        return new CategoryService();
-    }
-
-
-
-    @Bean
-    public ProductService productService() {
-                    return new ProductService();
     }
 
     @Bean
@@ -135,12 +129,11 @@ public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationCon
     }
 
     @Bean
-    public CategoryRepo categoryRepo(){
-        return new CategoryRepo();
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(emf);
+        return transactionManager;
     }
 
-    @Bean
-    public     ProductRepo productRepo(){
-        return new ProductRepo();
-    }
+
 }

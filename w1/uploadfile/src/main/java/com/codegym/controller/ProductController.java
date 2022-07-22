@@ -1,10 +1,18 @@
 package com.codegym.controller;
 
+
+import com.codegym.model.Category;
 import com.codegym.model.Product;
-import com.codegym.repository.ProductRepo;
 import com.codegym.service.CategoryService;
 import com.codegym.service.ProductService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Sort;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
@@ -14,35 +22,36 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.File;
 import java.io.IOException;
 
+
 @Controller
 public class ProductController {
     @Autowired
     ProductService productService;
-    @Autowired
-    ProductRepo productRepo;
+
     @Autowired
     CategoryService categoryService;
 
     @GetMapping("/products")
-    public ModelAndView show(){
+    public ModelAndView show(@RequestParam(defaultValue = "0") int page ){
         ModelAndView modelAndView = new ModelAndView("home");
-        modelAndView.addObject("products", productService.getAll());
+        Page<Product> products=productService.getAll(PageRequest.of(page,5, Sort.by("id")));
+        modelAndView.addObject("products",products);
         return modelAndView;
     }
 
     @GetMapping("/edit/{id}")
     public ModelAndView showEdit(@PathVariable int id){
         ModelAndView modelAndView = new ModelAndView("edit");
-        modelAndView.addObject("product", productRepo.findById(id));
+        modelAndView.addObject("product", productService.findByID(id));
         modelAndView.addObject("categories", categoryService.getAll());
         return modelAndView;
     }
 
     @PostMapping("/edit/{id}")
-    public ModelAndView edit(@ModelAttribute Product product, @PathVariable int id,
-                             @RequestParam int categoryIndex,@RequestParam MultipartFile file){
+    public ModelAndView edit(@ModelAttribute Product product,
+                             @RequestParam("categoryId") Category category,@RequestParam MultipartFile file){
 
-        String link=productRepo.findById(id).getImg();
+        String link=productService.findByID(product.getId()).getImg();
         String oldName=productService.nameFile2(link);
 
         product.setImg(link);
@@ -55,15 +64,15 @@ public class ProductController {
         }
 
         ModelAndView modelAndView = new ModelAndView("redirect:/products");
-        product.setCategory(categoryService.getAll().get(categoryIndex));
-        productRepo.edit(product);
+        product.setCategory(category);
+        productService.save(product);
         return modelAndView;
     }
 
 
     @GetMapping("/del/{id}")
     public ModelAndView del(@PathVariable("id") int id){
-        productService.delete(id);
+        productService.deleteByID(id);
         ModelAndView modelAndView = new ModelAndView("redirect:/products");
 
         return modelAndView;
@@ -79,7 +88,7 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public ModelAndView create(@ModelAttribute Product product, @RequestParam int categoryIndex,@RequestParam MultipartFile file){
+    public ModelAndView create(@ModelAttribute Product product, @RequestParam("categoryId")Category category, @RequestParam MultipartFile file){
             String newName= productService.newName(file);
             product.setImg("/img/" +newName );
 
@@ -89,16 +98,16 @@ public class ProductController {
             e.printStackTrace();
         }
         ModelAndView modelAndView = new ModelAndView("redirect:/products");
-        product.setCategory(categoryService.getAll().get(categoryIndex));
-       productService.create(product);
+        product.setCategory(category);
+       productService.save(product);
         return modelAndView;
     }
 
     @PostMapping("/search")
-    public ModelAndView search(@RequestParam String key){
+    public ModelAndView search(@RequestParam("key") String key,@RequestParam(defaultValue = "0") int page){
         ModelAndView modelAndView=new ModelAndView("home");
-
-        modelAndView.addObject("products",  productService.search(key));
+        Page<Product> products=productService.search(key,PageRequest.of(page,5, Sort.by("id")));
+        modelAndView.addObject("products", products );
         return modelAndView;
 
     }

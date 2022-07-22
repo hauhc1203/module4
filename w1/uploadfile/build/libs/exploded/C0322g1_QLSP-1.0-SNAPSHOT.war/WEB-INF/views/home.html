@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" style="width: auto;min-height: 800px">
   <h2><a href="/products">Home</a></h2>
   <div style="display: flex;justify-content: space-between;width: 1100px;height: auto">
     <a type="button" th:href="@{/create}" class="btn btn-primary">Create</a>
@@ -23,7 +23,7 @@
   <table class="table table-striped">
     <thead>
     <tr>
-      <th>id</th>
+      <th>#</th>
       <th>name</th>
       <th>price</th>
       <th>img</th>
@@ -34,8 +34,8 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="p,obj : ${products}">
-      <td th:text="${p.id}"></td>
+    <tr th:each="p,loop : ${products}">
+      <td th:text="${loop.count}"></td>
       <td th:text="${p.name}"></td>
       <td th:text="${p.price}"></td>
       <td><img th:src="${p.img}" style="width: 250px;height: auto"></td>
@@ -50,7 +50,36 @@
     </tr>
     </tbody>
   </table>
+
+</div>
+<div style="    display: flex;
+    justify-content: right;">
+<!--  <b th:text="${products.number} + 1"></b> / <b th:text="${products.totalPages}"></b>-->
+  <br>
+  <button th:if="${products.hasPrevious()}"><a th:href="@{/products(page=0)}"><<</a></button>
+
+  <button th:if="${products.hasPrevious()}"><a th:href="@{/products(page=${products.number}-1)}"><</a></button>
+
+  <button th:each="i: ${#numbers.sequence(1, products.totalPages)}"><a  class="active" th:text="${i}" th:href="@{/products(page=${i} - 1)}"></a></button>
+
+  <button th:if="${products.hasNext()}"><a th:href="@{/products(page=${products.number}+1)}">></a></button>
+  <button th:if="${products.hasNext()}"><a th:href="@{/products(page=${products.getSize()}-1)}">>></a></button>
 </div>
 
 </body>
+<script>
+  let websocket = new WebSocket("ws://localhost:8080/products");
+  websocket.onopen = function() {
+    console.log(1)
+  };
+  websocket.onmessage = function(message) {
+    // DO SOMETHING
+  };
+  websocket.onclose = function() {
+    // DO SOMETHING
+  };
+  websocket.onerror = function(message) {
+    // DO SOMETHING
+  };
+</script>
 </html>
